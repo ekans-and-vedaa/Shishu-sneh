@@ -3,14 +3,13 @@ package com.shishusneh
 import android.Manifest
 import android.content.Context
 import android.net.Uri
-
 import android.os.Build
 import android.os.Bundle
-
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -28,12 +27,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.WorkManager
@@ -42,6 +44,7 @@ import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.shishusneh.data.Milestone
 import com.shishusneh.data.ShishuDatabase
 import com.shishusneh.data.ShishuRepository
@@ -204,9 +207,9 @@ fun HomeScreen(viewModel: MainViewModel) {
     ) {
         // PROFILE CARD
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().shadow(8.dp, RoundedCornerShape(32.dp)),
             shape = RoundedCornerShape(32.dp),
-            colors = CardDefaults.cardColors(containerColor = BlueLight.copy(alpha = 0.6f))
+            colors = CardDefaults.cardColors(containerColor = BlueLight.copy(alpha = 0.9f))
         ) {
             Column(modifier = Modifier.padding(20.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -307,7 +310,7 @@ fun TipSection(title: String, content: String, icon: ImageVector, backgroundColo
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Medium,
                 color = TextDark,
-                lineHeight = androidx.compose.ui.unit.TextUnit.Unspecified
+                lineHeight = 24.sp
             )
         }
     }
@@ -500,16 +503,18 @@ fun GrowthScreen(viewModel: MainViewModel) {
             Button(
                 onClick = { showAnalysis = true },
                 colors = ButtonDefaults.buttonColors(containerColor = SoftRose),
-                shape = RoundedCornerShape(12.dp),
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                shape = RoundedCornerShape(16.dp),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
             ) {
-                Icon(Icons.Rounded.BarChart, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(if (isHindi) "चार्ट" else "Chart", style = MaterialTheme.typography.labelLarge)
+                Icon(Icons.Rounded.AutoGraph, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(if (isHindi) "विश्लेषण" else "Analyze", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
             }
         }
         Spacer(modifier = Modifier.height(20.dp))
 
+        // Logging Card
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(28.dp),
@@ -519,13 +524,13 @@ fun GrowthScreen(viewModel: MainViewModel) {
             Column(modifier = Modifier.padding(24.dp)) {
                 if (daysUntilNext > 0) {
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                        Icon(Icons.Rounded.Lock, contentDescription = null, tint = TextMedium, modifier = Modifier.size(20.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Icon(Icons.Rounded.LockClock, contentDescription = null, tint = SoftBlue, modifier = Modifier.size(24.dp))
+                        Spacer(modifier = Modifier.width(12.dp))
                         Text(
                             text = if (isHindi) "अगला अपडेट $daysUntilNext दिनों में" else "Next update in $daysUntilNext days",
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.bodyLarge,
                             color = TextMedium,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 } else {
@@ -550,7 +555,7 @@ fun GrowthScreen(viewModel: MainViewModel) {
                         OutlinedTextField(
                             value = height,
                             onValueChange = { height = it },
-                            label = { Text(if (isHindi) "ऊंचाई (cm)" else "Ht (cm)") },
+                            label = { Text(if (isHindi) "ऊंचाई (cm)" else "Height (cm)") },
                             modifier = Modifier.weight(1f),
                             singleLine = true,
                             shape = RoundedCornerShape(16.dp),
@@ -565,11 +570,11 @@ fun GrowthScreen(viewModel: MainViewModel) {
                                 height = ""
                             }
                         },
-                        modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(50.dp),
+                        modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(54.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = SoftBlue)
                     ) {
-                        Text(if (isHindi) "प्रगति सहेजें" else "Save Progress", fontWeight = FontWeight.Bold)
+                        Text(if (isHindi) "प्रगति सहेजें" else "Save Progress", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                     }
                 }
             }
@@ -577,81 +582,46 @@ fun GrowthScreen(viewModel: MainViewModel) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        // Main Growth Chart Card
         Text(
-            if (isHindi) "विकास चार्ट" else "Growth Chart",
+            if (isHindi) "विकास रुझान" else "Growth Trends",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             color = TextDark
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         Card(
-            modifier = Modifier.fillMaxWidth().height(280.dp),
-            shape = RoundedCornerShape(28.dp),
+            modifier = Modifier.fillMaxWidth().height(300.dp),
+            shape = RoundedCornerShape(32.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(2.dp)
+            elevation = CardDefaults.cardElevation(4.dp)
         ) {
-            AndroidView(
-                factory = { context ->
-                    LineChart(context).apply {
-                        description = Description().apply { text = "" }
-                        xAxis.position = XAxis.XAxisPosition.BOTTOM
-                        xAxis.setDrawGridLines(false)
-                        axisRight.isEnabled = false
-                        legend.isEnabled = true
-                        setTouchEnabled(true)
-                        isDragEnabled = true
-                        setScaleEnabled(true)
-                        setExtraOffsets(10f, 10f, 10f, 10f)
-                    }
-                },
-                update = { chart ->
-                    if (records.isNotEmpty()) {
-                        val wEntries = records.mapIndexed { i, r -> Entry(i.toFloat(), r.weightKg) }
-                        val hEntries = records.mapIndexed { i, r -> Entry(i.toFloat(), r.heightCm) }
-
-                        val wSet = LineDataSet(wEntries, if (isHindi) "वजन (kg)" else "Weight (kg)").apply {
-                            color = android.graphics.Color.parseColor("#64B5F6")
-                            setCircleColor(android.graphics.Color.parseColor("#64B5F6"))
-                            lineWidth = 4f
-                            circleRadius = 6f
-                            setDrawCircleHole(true)
-                            circleHoleColor = android.graphics.Color.WHITE
-                            setDrawValues(false)
-                            mode = LineDataSet.Mode.CUBIC_BEZIER
-                        }
-                        val hSet = LineDataSet(hEntries, if (isHindi) "ऊंचाई (cm)" else "Height (cm)").apply {
-                            color = android.graphics.Color.parseColor("#F48FB1")
-                            setCircleColor(android.graphics.Color.parseColor("#F48FB1"))
-                            lineWidth = 4f
-                            circleRadius = 6f
-                            setDrawCircleHole(true)
-                            circleHoleColor = android.graphics.Color.WHITE
-                            setDrawValues(false)
-                            mode = LineDataSet.Mode.CUBIC_BEZIER
-                        }
-
-                        chart.data = LineData(wSet, hSet)
-                        chart.animateX(500)
-                        chart.invalidate()
-                    }
-                },
-                modifier = Modifier.fillMaxSize().padding(12.dp)
-            )
+            Box(modifier = Modifier.padding(16.dp)) {
+                StyledLineChart(
+                    entries1 = records.mapIndexed { i, r -> Entry(i.toFloat(), r.weightKg) },
+                    label1 = if (isHindi) "वजन (kg)" else "Weight (kg)",
+                    color1 = "#64B5F6",
+                    entries2 = records.mapIndexed { i, r -> Entry(i.toFloat(), r.heightCm) },
+                    label2 = if (isHindi) "ऊंचाई (cm)" else "Height (cm)",
+                    color2 = "#F48FB1"
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        // Past Records List
         Text(
             if (isHindi) "पिछले रिकॉर्ड" else "Past Records",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             color = TextDark
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         records.reversed().forEach { record ->
             Card(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
-                shape = RoundedCornerShape(20.dp),
+                shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 elevation = CardDefaults.cardElevation(1.dp)
             ) {
@@ -663,27 +633,28 @@ fun GrowthScreen(viewModel: MainViewModel) {
                         Text(
                             text = dateFormat.format(java.util.Date(record.date)),
                             style = MaterialTheme.typography.labelMedium,
-                            color = TextMedium
+                            color = TextMedium,
+                            fontWeight = FontWeight.SemiBold
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(6.dp))
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Rounded.MonitorWeight, contentDescription = null, modifier = Modifier.size(18.dp), tint = SoftBlue)
-                            Spacer(modifier = Modifier.width(6.dp))
+                            Icon(Icons.Rounded.MonitorWeight, contentDescription = null, modifier = Modifier.size(20.dp), tint = SoftBlue)
+                            Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = "${record.weightKg} kg",
                                 style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.ExtraBold,
                                 color = TextDark
                             )
                         }
                     }
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Rounded.Height, contentDescription = null, modifier = Modifier.size(18.dp), tint = SoftRose)
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Icon(Icons.Rounded.Height, contentDescription = null, modifier = Modifier.size(20.dp), tint = SoftRose)
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "${record.heightCm} cm",
                             style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.ExtraBold,
                             color = TextDark
                         )
                     }
@@ -691,6 +662,87 @@ fun GrowthScreen(viewModel: MainViewModel) {
             }
         }
     }
+}
+
+@Composable
+fun StyledLineChart(
+    entries1: List<Entry>,
+    label1: String,
+    color1: String,
+    entries2: List<Entry>? = null,
+    label2: String? = null,
+    color2: String? = null,
+    drawFilled: Boolean = true
+) {
+    AndroidView(
+        factory = { context ->
+            LineChart(context).apply {
+                description = Description().apply { text = "" }
+                xAxis.position = XAxis.XAxisPosition.BOTTOM
+                xAxis.setDrawGridLines(false)
+                xAxis.granularity = 1f
+                xAxis.textColor = android.graphics.Color.GRAY
+                
+                axisLeft.setDrawGridLines(true)
+                axisLeft.gridColor = android.graphics.Color.parseColor("#EEEEEE")
+                axisLeft.textColor = android.graphics.Color.GRAY
+                
+                axisRight.isEnabled = false
+                legend.isEnabled = true
+                legend.verticalAlignment = com.github.mikephil.charting.components.Legend.LegendVerticalAlignment.TOP
+                legend.horizontalAlignment = com.github.mikephil.charting.components.Legend.LegendHorizontalAlignment.RIGHT
+                
+                setTouchEnabled(true)
+                setPinchZoom(true)
+                setScaleEnabled(true)
+                setExtraOffsets(10f, 10f, 10f, 10f)
+            }
+        },
+        update = { chart ->
+            val dataSets = mutableListOf<LineDataSet>()
+            
+            val set1 = LineDataSet(entries1, label1).apply {
+                color = android.graphics.Color.parseColor(color1)
+                setCircleColor(android.graphics.Color.parseColor(color1))
+                lineWidth = 3f
+                circleRadius = 5f
+                setDrawCircleHole(true)
+                circleHoleColor = android.graphics.Color.WHITE
+                mode = LineDataSet.Mode.CUBIC_BEZIER
+                setDrawValues(false)
+                if (drawFilled) {
+                    setDrawFilled(true)
+                    fillAlpha = 40
+                    fillColor = android.graphics.Color.parseColor(color1)
+                }
+            }
+            dataSets.add(set1)
+            
+            if (entries2 != null && label2 != null && color2 != null) {
+                val set2 = LineDataSet(entries2, label2).apply {
+                    color = android.graphics.Color.parseColor(color2)
+                    setCircleColor(android.graphics.Color.parseColor(color2))
+                    lineWidth = 3f
+                    circleRadius = 5f
+                    setDrawCircleHole(true)
+                    circleHoleColor = android.graphics.Color.WHITE
+                    mode = LineDataSet.Mode.CUBIC_BEZIER
+                    setDrawValues(false)
+                    if (drawFilled) {
+                        setDrawFilled(true)
+                        fillAlpha = 40
+                        fillColor = android.graphics.Color.parseColor(color2)
+                    }
+                }
+                dataSets.add(set2)
+            }
+
+            chart.data = LineData(dataSets as List<ILineDataSet>)
+            chart.animateX(800)
+            chart.invalidate()
+        },
+        modifier = Modifier.fillMaxSize()
+    )
 }
 
 @Composable
@@ -704,6 +756,7 @@ fun GrowthAnalysisDialog(viewModel: MainViewModel, onDismiss: () -> Unit) {
     val ageMonths = viewModel.getBabyAgeInMonths(profile!!.dateOfBirth).coerceIn(0, 12)
     val latestRecord = records.lastOrNull()
     val average = GrowthData.getAverageForMonth(ageMonths, profile!!.gender)
+    val dob = profile!!.dateOfBirth
     
     val analysis = if (latestRecord != null) {
         GrowthData.analyze(latestRecord.weightKg, latestRecord.heightCm, average, isHindi)
@@ -712,169 +765,199 @@ fun GrowthAnalysisDialog(viewModel: MainViewModel, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text(
-                if (isHindi) "विकास विश्लेषण" else "Growth Analysis",
-                fontWeight = FontWeight.Bold,
-                color = TextDark
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Rounded.AutoGraph, contentDescription = null, tint = SoftRose, modifier = Modifier.size(32.dp))
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    if (isHindi) "स्मार्ट विकास विश्लेषण" else "Smart Growth Analysis",
+                    fontWeight = FontWeight.Black,
+                    color = TextDark,
+                    fontSize = 22.sp
+                )
+            }
         },
         text = {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 if (latestRecord != null) {
-                    Text(
-                        if (isHindi) "आयु: $ageMonths महीने" else "Age: $ageMonths Months",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = TextMedium
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
+                    // Age Badge
+                    Surface(
+                        color = BlueLight,
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.padding(bottom = 20.dp)
+                    ) {
+                        Text(
+                            if (isHindi) "आयु: $ageMonths महीने" else "Current Age: $ageMonths Months",
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = SoftBlue
+                        )
+                    }
                     
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(if (isHindi) "वजन (kg)" else "Weight (kg)", style = MaterialTheme.typography.labelSmall, color = TextMedium)
-                            Text("${latestRecord.weightKg}", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = SoftBlue)
-                            Text("${if (isHindi) "औसत" else "Avg"}: ${average.weight}", style = MaterialTheme.typography.labelSmall, color = TextMedium)
-                        }
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(if (isHindi) "ऊंचाई (cm)" else "Height (cm)", style = MaterialTheme.typography.labelSmall, color = TextMedium)
-                            Text("${latestRecord.heightCm}", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = SoftRose)
-                            Text("${if (isHindi) "औसत" else "Avg"}: ${average.height}", style = MaterialTheme.typography.labelSmall, color = TextMedium)
-                        }
+                    // Comparison Stats
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        ComparisonCard(
+                            label = if (isHindi) "वजन (kg)" else "Weight (kg)",
+                            actual = latestRecord.weightKg,
+                            avg = average.weight,
+                            color = SoftBlue,
+                            modifier = Modifier.weight(1f)
+                        )
+                        ComparisonCard(
+                            label = if (isHindi) "ऊंचाई (cm)" else "Height (cm)",
+                            actual = latestRecord.heightCm,
+                            avg = average.height,
+                            color = SoftRose,
+                            modifier = Modifier.weight(1f)
+                        )
                     }
                     
                     if (analysis != null) {
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(28.dp))
+                        // Status Banner
                         Card(
-                            colors = CardDefaults.cardColors(containerColor = SageLight),
-                            shape = RoundedCornerShape(16.dp)
+                            colors = CardDefaults.cardColors(containerColor = SageLight.copy(alpha = 0.8f)),
+                            shape = RoundedCornerShape(24.dp),
+                            border = androidx.compose.foundation.BorderStroke(2.dp, SoftSage.copy(alpha = 0.4f))
                         ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Text(
-                                    text = "${if (isHindi) "स्थिति:" else "Status:"} ${analysis.weightStatus}, ${analysis.heightStatus}",
-                                    fontWeight = FontWeight.Bold,
-                                    color = TextDark
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
+                            Column(modifier = Modifier.padding(20.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Rounded.Stars, contentDescription = null, tint = SoftSage, modifier = Modifier.size(24.dp))
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Text(
+                                        text = "${if (isHindi) "स्थिति:" else "Status:"} ${analysis.weightStatus}",
+                                        fontWeight = FontWeight.Black,
+                                        color = TextDark,
+                                        fontSize = 18.sp
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(14.dp))
                                 Text(
                                     text = analysis.suggestion,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = TextDark
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = TextDark,
+                                    lineHeight = 26.sp,
+                                    fontWeight = FontWeight.Medium
                                 )
                             }
                         }
                     }
                 } else {
-                    Text(if (isHindi) "विश्लेषण के लिए कोई डेटा नहीं है।" else "No data available for analysis.")
+                    Box(modifier = Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
+                        Text(if (isHindi) "विश्लेषण के लिए कोई डेटा नहीं है।" else "No data available yet. Start logging growth!", textAlign = TextAlign.Center, color = TextMedium)
+                    }
                 }
                 
-                Spacer(modifier = Modifier.height(24.dp))
-                Text(
-                    if (isHindi) "औसत वजन वृद्धि (0-12 महीने)" else "Average Weight Growth (0-12 Months)",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(36.dp))
                 
-                Box(modifier = Modifier.fillMaxWidth().height(180.dp)) {
-                    AndroidView(
-                        factory = { context ->
-                            LineChart(context).apply {
-                                description = Description().apply { text = "" }
-                                xAxis.position = XAxis.XAxisPosition.BOTTOM
-                                axisRight.isEnabled = false
-                                legend.isEnabled = true
-                                setExtraOffsets(5f, 5f, 5f, 5f)
-                            }
-                        },
-                        update = { chart ->
-                            val averages = if (profile!!.gender.lowercase().contains("girl") || profile!!.gender.contains("स्त्री") || profile!!.gender.contains("लड़की")) GrowthData.girlAverages else GrowthData.boyAverages
-                            val dob = profile!!.dateOfBirth
-                            
-                            val avgWEntries = averages.map { Entry(it.month.toFloat(), it.weight) }
-                            val babyWEntries = records.map { r -> 
-                                val month = (r.date - dob).toFloat() / (1000f * 60 * 60 * 24 * 30.44f)
-                                Entry(month, r.weightKg)
-                            }.sortedBy { it.x }
-
-                            val avgSet = LineDataSet(avgWEntries, if (isHindi) "औसत वजन" else "Avg Weight").apply {
-                                color = android.graphics.Color.LTGRAY
-                                setDrawCircles(false)
-                                lineWidth = 2f
-                                enableDashedLine(10f, 10f, 0f)
-                            }
-                            
-                            val babySet = LineDataSet(babyWEntries, if (isHindi) "आपका बच्चा" else "Your Baby").apply {
-                                color = android.graphics.Color.parseColor("#64B5F6")
-                                setCircleColor(android.graphics.Color.parseColor("#64B5F6"))
-                                lineWidth = 3f
-                                circleRadius = 4f
-                            }
-
-                            chart.data = LineData(avgSet, babySet)
-                            chart.invalidate()
-                        },
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-
+                // Detailed Charts Section
+                SectionHeader(if (isHindi) "वजन विकास मार्ग" else "Weight Growth Path")
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    if (isHindi) "औसत ऊंचाई वृद्धि (0-12 महीने)" else "Average Height Growth (0-12 Months)",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                Box(modifier = Modifier.fillMaxWidth().height(180.dp)) {
-                    AndroidView(
-                        factory = { context ->
-                            LineChart(context).apply {
-                                description = Description().apply { text = "" }
-                                xAxis.position = XAxis.XAxisPosition.BOTTOM
-                                axisRight.isEnabled = false
-                                legend.isEnabled = true
-                                setExtraOffsets(5f, 5f, 5f, 5f)
-                            }
-                        },
-                        update = { chart ->
-                            val averages = if (profile!!.gender.lowercase().contains("girl") || profile!!.gender.contains("स्त्री") || profile!!.gender.contains("लड़की")) GrowthData.girlAverages else GrowthData.boyAverages
-                            val dob = profile!!.dateOfBirth
-                            
-                            val avgHEntries = averages.map { Entry(it.month.toFloat(), it.height) }
-                            val babyHEntries = records.map { r -> 
-                                val month = (r.date - dob).toFloat() / (1000f * 60 * 60 * 24 * 30.44f)
-                                Entry(month, r.heightCm)
-                            }.sortedBy { it.x }
-
-                            val avgSet = LineDataSet(avgHEntries, if (isHindi) "औसत ऊंचाई" else "Avg Height").apply {
-                                color = android.graphics.Color.LTGRAY
-                                setDrawCircles(false)
-                                lineWidth = 2f
-                                enableDashedLine(10f, 10f, 0f)
-                            }
-                            
-                            val babySet = LineDataSet(babyHEntries, if (isHindi) "आपका बच्चा" else "Your Baby").apply {
-                                color = android.graphics.Color.parseColor("#F48FB1")
-                                setCircleColor(android.graphics.Color.parseColor("#F48FB1"))
-                                lineWidth = 3f
-                                circleRadius = 4f
-                            }
-
-                            chart.data = LineData(avgSet, babySet)
-                            chart.invalidate()
-                        },
-                        modifier = Modifier.fillMaxSize()
+                ChartContainer {
+                    val averages = if (profile!!.gender.lowercase().contains("girl") || profile!!.gender.contains("स्त्री") || profile!!.gender.contains("लड़की")) GrowthData.girlAverages else GrowthData.boyAverages
+                    StyledLineChart(
+                        entries1 = averages.map { Entry(it.month.toFloat(), it.weight) },
+                        label1 = if (isHindi) "स्वस्थ औसत" else "Healthy Avg",
+                        color1 = "#BDBDBD",
+                        entries2 = records.map { r -> Entry((r.date - dob).toFloat() / (1000f * 60 * 60 * 24 * 30.44f), r.weightKg) }.sortedBy { it.x },
+                        label2 = if (isHindi) "आपका बच्चा" else "Your Baby",
+                        color2 = "#64B5F6",
+                        drawFilled = false
                     )
                 }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                SectionHeader(if (isHindi) "ऊंचाई विकास मार्ग" else "Height Growth Path")
+                Spacer(modifier = Modifier.height(16.dp))
+                ChartContainer {
+                    val averages = if (profile!!.gender.lowercase().contains("girl") || profile!!.gender.contains("स्त्री") || profile!!.gender.contains("लड़की")) GrowthData.girlAverages else GrowthData.boyAverages
+                    StyledLineChart(
+                        entries1 = averages.map { Entry(it.month.toFloat(), it.height) },
+                        label1 = if (isHindi) "स्वस्थ औसत" else "Healthy Avg",
+                        color1 = "#BDBDBD",
+                        entries2 = records.map { r -> Entry((r.date - dob).toFloat() / (1000f * 60 * 60 * 24 * 30.44f), r.heightCm) }.sortedBy { it.x },
+                        label2 = if (isHindi) "आपका बच्चा" else "Your Baby",
+                        color2 = "#F48FB1",
+                        drawFilled = false
+                    )
+                }
+                Spacer(modifier = Modifier.height(20.dp))
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(if (isHindi) "ठीक है" else "OK", color = SoftBlue)
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(containerColor = SoftBlue),
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                Text(if (isHindi) "ठीक है, धन्यवाद" else "Got it, Thanks!", fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
         },
         containerColor = Color.White,
-        shape = RoundedCornerShape(24.dp)
+        shape = RoundedCornerShape(32.dp)
     )
+}
+
+@Composable
+fun ChartContainer(content: @Composable () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth().height(240.dp),
+        colors = CardDefaults.cardColors(containerColor = WarmWhite),
+        shape = RoundedCornerShape(24.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.3f))
+    ) {
+        Box(modifier = Modifier.padding(12.dp)) {
+            content()
+        }
+    }
+}
+
+@Composable
+fun SectionHeader(title: String) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+        HorizontalDivider(modifier = Modifier.weight(1f), color = Color.LightGray.copy(alpha = 0.5f))
+        Text(
+            text = title,
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.Black,
+            color = TextMedium,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
+        HorizontalDivider(modifier = Modifier.weight(1f), color = Color.LightGray.copy(alpha = 0.5f))
+    }
+}
+
+@Composable
+fun ComparisonCard(label: String, actual: Float, avg: Float, color: Color, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier.shadow(4.dp, RoundedCornerShape(24.dp)),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        shape = RoundedCornerShape(24.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, color.copy(alpha = 0.1f))
+    ) {
+        Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(label, style = MaterialTheme.typography.labelSmall, color = TextMedium, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("$actual", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Black, color = color)
+            Spacer(modifier = Modifier.height(8.dp))
+            Surface(
+                color = color.copy(alpha = 0.1f), 
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                val diff = actual - avg
+                val diffStr = if (diff >= 0) "+${String.format("%.1f", diff)}" else String.format("%.1f", diff)
+                Text(
+                    "$diffStr vs Avg",
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                    style = MaterialTheme.typography.labelSmall, 
+                    color = color,
+                    fontWeight = FontWeight.ExtraBold
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -1024,7 +1107,7 @@ fun getMilestoneIcon(id: String): ImageVector {
 
 @Composable
 fun BottomNavigationBar(active: String, onSelect: (String) -> Unit) {
-    NavigationBar(containerColor = Color.White) {
+    NavigationBar(containerColor = Color.White, tonalElevation = 8.dp) {
         val items = listOf(
             Triple("Home", Icons.Rounded.Home, BlueLight),
             Triple("Growth", Icons.Rounded.AutoGraph, RoseLight),
