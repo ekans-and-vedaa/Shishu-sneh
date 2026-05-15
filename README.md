@@ -31,12 +31,44 @@
 - **Image Loading**: Coil
 - **Architecture**: MVVM (Model-View-ViewModel) with Repository pattern and Kotlin Coroutines/Flow.
 
-## 📸 Screenshots
+<h2>Screenshots</h2>
 
-![alt text](<WhatsApp Image 2026-05-15 at 19.03.43.jpeg>) ![alt text](<WhatsApp Image 2026-05-15 at 19.03.43 (1)-1.jpeg>)
-![alt text](<WhatsApp Image 2026-05-15 at 19.03.42 (1).jpeg>) ![alt text](<WhatsApp Image 2026-05-15 at 19.03.42.jpeg>) ![alt text](<WhatsApp Image 2026-05-15 at 19.03.44 (3).jpeg>) ![alt text](<WhatsApp Image 2026-05-15 at 19.03.44 (2).jpeg>) ![alt text](<WhatsApp Image 2026-05-15 at 19.03.44 (1).jpeg>)
-![alt text](<WhatsApp Image 2026-05-15 at 19.03.43 (3).jpeg>)
-![alt text](<WhatsApp Image 2026-05-15 at 19.03.43 (2).jpeg>)
+<h3>Dashboard Screens</h3>
+<p align="center">
+  <img src="images/Dashboard english.jpeg" width="45%" />
+  <img src="images/dashboard hindi.jpeg" width="45%" />
+</p>
+
+<h3>Growth Screens</h3>
+<p align="center">
+  <img src="images/GROWTH SCREEN.jpeg" width="45%" />
+  
+</p>
+
+<p align="center">
+  <img src="images/Growth Screen analysis.jpeg" width="45%" />
+  <img src="images/growth screen analysis (2).jpeg" width="45%" />
+  
+</p>
+
+<p align="center">
+  <img src="images/Smart growth analysis -1.jpeg" width="45%" />
+    <img src="images/SMART GROWTH ANALYSIS - 2.jpeg" width="45%" />
+</p>
+
+<h3>Vaccination Screens</h3>
+<p align="center">
+  
+  <img src="images/vaccine Screen - ENG.jpeg" width="45%" />
+  <img src="images/Vaccination screen - HINDI.jpeg" width="45%" />
+</p>
+
+<h3>Additional</h3>
+<p align="center">
+  <img src="images/A.jpeg" width="45%" />
+</p>
+
+
 ## 🚀 Getting Started
 
 1.  Clone the repository:
