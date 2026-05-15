@@ -32,9 +32,9 @@
 - **Architecture**: MVVM (Model-View-ViewModel) with Repository pattern and Kotlin Coroutines/Flow.
 
 <h2>Screenshots</h2>
-<h3>Dashboard Screens</h3>
+<h3>onboarding . .</h3>
 <p align="center">
-  <img src="images/onboarding.jpeg" width="44%" />
+  <img src="images/onboarding.jpeg" width="31%" />
 </p>
 
 <h3>Dashboard Screens</h3>
