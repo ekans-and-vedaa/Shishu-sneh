@@ -12,9 +12,10 @@
 - **Immunization Guide**:
     - Automated vaccination schedule based on the baby's date of birth.
     - Descriptions of diseases and vaccines (BCG, OPV, Hepatitis B, etc.).
-    - **Smart Notifications**: Receive background alerts for upcoming mandatory vaccinations via WorkManager.
+- **Smart Notifications**:
+    - Receive background alerts for upcoming mandatory vaccinations via WorkManager
 - **Skill Milestones**:
-    - Track developmental milestones from birth up to 5 years (e.g., first smile, crawling, first steps).
+    - Track developmental milestones from birth up to 5 years (e.g., first smile, first steps).
     - Capture and save "Memory Photos" for each milestone achieved.
 - **Daily Tips**:
     - Personalized daily feeding and care tips for the baby.
