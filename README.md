@@ -34,7 +34,7 @@
 <h2>Screenshots</h2>
 <h3>onboarding . .</h3>
 <p align="center">
-  <img src="images/onboarding.jpeg" width="31%" />
+  <img src="images/1 onboarding.jpeg" width="46%" />
 </p>
 
 <h3>Dashboard Screens</h3>
