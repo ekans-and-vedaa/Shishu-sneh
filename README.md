@@ -2,7 +2,7 @@
 
 **Shishu-Sneh** is a comprehensive Android application designed to be a digital companion for parents during their baby's crucial first year. The app provides personalized guidance, health tracking, and milestone logging to ensure healthy growth and development.
 
-## 🌟 Features
+## Features
 
 - **Personalized Onboarding**: Create a dedicated profile for your baby including name, date of birth, and gender.
 - **Smart Growth Tracking**: 
@@ -22,7 +22,7 @@
     - Dedicated nutritional and self-care tips for the mother.
 - **Multilingual Support**: Fully functional in both **English** and **Hindi**.
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - **UI**: Jetpack Compose (Material 3)
 - **Language**: Kotlin
@@ -74,7 +74,7 @@
 </p>
 
 
-## 🚀 Getting Started
+## Getting Started
 
 1.  Clone the repository:
     ```bash
@@ -84,7 +84,7 @@
 3.  Sync the project with Gradle files.
 4.  Run the application on an emulator or a physical device (API 24+).
 
-## 📂 Project Structure
+## Project Structure
 
 - `ui/`: Contains Compose screens and the theme definition.
 - `data/`: Room entities, DAO, Database configuration, and Repository.
