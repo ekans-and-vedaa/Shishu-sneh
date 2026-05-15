@@ -1,3 +1,19 @@
+<div align="center">
+
+# 👶 Shishu-Sneh (शिशु-स्नेह)
+
+### Smart Baby Health Tracking & Parenting Assistant
+
+<img src="images/A.jpeg" width="170"/>
+
+<br><br>
+
+![Kotlin](https://img.shields.io/badge/Kotlin-Android-orange?style=for-the-badge&logo=kotlin)
+![Jetpack Compose](https://img.shields.io/badge/Jetpack-Compose-blue?style=for-the-badge)
+![Room DB](https://img.shields.io/badge/Database-Room-green?style=for-the-badge)
+![Platform](https://img.shields.io/badge/Platform-Android-brightgreen?style=for-the-badge&logo=android)
+
+</div>
 # Shishu-Sneh (शिशु-स्नेह)
 
 **Shishu-Sneh** is a comprehensive Android application designed to be a digital companion for parents during their baby's crucial first year. The app provides personalized guidance, health tracking, and milestone logging to ensure healthy growth and development.
